@@ -1,0 +1,29 @@
+{
+    "table_name": "users",
+    "driver": "MYSQL",
+    "columns": {
+        "userId": {
+            "numeric_precision": 10,
+            "numeric_scale": 0,
+            "numeric_type": 0,
+            "column_index": 1,
+            "column_name": "userId",
+            "data_type": "Integer",
+            "db_type": "int(11)"
+        },
+        "username": {
+            "char_max_length": 25,
+            "column_index": 2,
+            "column_name": "username",
+            "data_type": "String",
+            "db_type": "varchar(25)"
+        },
+        "password": {
+            "char_max_length": 25,
+            "column_index": 3,
+            "column_name": "password",
+            "data_type": "String",
+            "db_type": "varchar(25)"
+        }
+    }
+}
