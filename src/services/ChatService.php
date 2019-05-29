@@ -16,6 +16,17 @@ class  ChatService  extends  HasamiWrapper
 		$conn = $properties->connection;
 		$connector->init($conn);
 		parent::__construct(self::TABLE_NAME, $connector, "chatId");
+		$this->set_service_status("POST", ServiceStatus::LOGGED);
+		var_dump(get_access(1));
+	}
+    /**
+     * Validates access for chat services
+     * @return boolean True if the validation access succeed
+     */
+	protected function validate_access()
+	{
+		session_start();
+		$token = $_SESSION["token"];
+		return !is_null($token);
 	}
 }
-?>

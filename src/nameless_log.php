@@ -6,12 +6,11 @@
 include_once  "lib/urabe/HasamiWrapper.php";
 include_once  "utils/Caterpillar.php";
 include_once  "utils/ServiceUtils.php";
-
+include_once  "services/UserService.php";
 $content = new WebServiceContent();
 $service_name = $content->url_params[0];
 switch ($service_name) {
     case 'users':
-        include_once  "services/UserService.php";
         $service  =  new  UserService();
         break;
     case 'chat':

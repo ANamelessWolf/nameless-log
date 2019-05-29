@@ -28,7 +28,7 @@ class  UserService  extends  HasamiWrapper
 		session_start();
 		$token = $_SESSION["token"];
 		if (is_null($token))
-			return true;
+			return false;
 		else {
 			$sql =	$this->urabe->format_sql_place_holders("SELECT username FROM " . self::TABLE_NAME . " WHERE SHA1(CONCAT(username,pass)) = @1");
 			$username = $this->urabe->select_one($sql, array($token));
@@ -98,6 +98,8 @@ class  UserService  extends  HasamiWrapper
 		if (is_null($token))
 			return get_system_response("users", "NotLogged");
 		else {
+			$access = get_access($data->body->condition);
+			
 			$sql =	$this->urabe->format_sql_place_holders("SELECT * FROM " . self::TABLE_NAME . " WHERE SHA1(CONCAT(username,pass)) = @1");
 			$queryResult = $this->urabe->select($sql, array($token));
 			$username = $queryResult->result[0]["username"];
