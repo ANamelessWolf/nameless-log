@@ -1,4 +1,5 @@
 <?php
+
 return (object)
 array(
     "connection"=> 
@@ -7,6 +8,11 @@ array(
         "user_name"=> "root", 
         "password"=>"", 
         "port"=> 3306, 
-        "db_name"=>'nameless_log')
-    );
+        "db_name"=>'nameless_log'),
+    "admin"=>
+    (object)array(
+        //The username identified as an administrator
+        "username"=> 'nameless'
+    )
+);
 ?>

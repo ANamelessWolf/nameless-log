@@ -3,7 +3,7 @@ include_once  "lib/urabe/HasamiWrapper.php";
 /**
  * User table controller
  */
-class  UserService  extends  HasamiWrapper
+class  ChatMembersService  extends  HasamiWrapper
 {
 	const  TABLE_NAME  =  "chat_members";
 	/**
