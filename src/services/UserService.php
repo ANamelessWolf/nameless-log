@@ -129,7 +129,9 @@ class  UserService  extends  HasamiWrapper
 		$sql = $urabe->format_sql_place_holders($sql);
 		$cat = new Caterpillar();
 		$urabe->set_parser(new MysteriousParser());
-		$token = $urabe->select_one($sql, array($data->body->username, $cat->encrypt($data->body->pass)));
+		$pasword = $cat->encrypt($data->body->pass);
+
+		$token = $urabe->select_one($sql, array($data->body->username, $pasword));
 		if (!is_null($token)) {
 			session_start();
 			$_SESSION["token"] = sha1($token);
