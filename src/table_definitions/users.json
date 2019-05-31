@@ -18,12 +18,36 @@
             "data_type": "String",
             "db_type": "varchar(25)"
         },
-        "password": {
-            "char_max_length": 25,
+        "pass": {
+            "char_max_length": 250,
             "column_index": 3,
-            "column_name": "password",
+            "column_name": "pass",
             "data_type": "String",
-            "db_type": "varchar(25)"
+            "db_type": "varchar(250)"
+        },
+        "USER": {
+            "column_index": 1,
+            "column_name": "USER",
+            "data_type": "char(16)",
+            "db_type": "char(16)"
+        },
+        "CURRENT_CONNECTIONS": {
+            "numeric_precision": 19,
+            "numeric_scale": 0,
+            "numeric_type": 0,
+            "column_index": 2,
+            "column_name": "CURRENT_CONNECTIONS",
+            "data_type": "Integer",
+            "db_type": "bigint(20)"
+        },
+        "TOTAL_CONNECTIONS": {
+            "numeric_precision": 19,
+            "numeric_scale": 0,
+            "numeric_type": 0,
+            "column_index": 3,
+            "column_name": "TOTAL_CONNECTIONS",
+            "data_type": "Integer",
+            "db_type": "bigint(20)"
         }
     }
 }

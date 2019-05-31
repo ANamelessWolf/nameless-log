@@ -54,30 +54,48 @@ class Caterpillar
      * Encrypts a string
      *
      * @param string $string The string to be encrypted
-     * @return The string encrypted
+     * @return string The encrypted string
      */
     public function encrypt($string)
     {
-        $block = mcrypt_get_block_size(MCRYPT_DES, MCRYPT_MODE_ECB);
-        $pad = $block - (strlen($string) % $block);
-        $string .= str_repeat(chr($pad), $pad);
-        $string = mcrypt_encrypt(MCRYPT_DES, $this->secure_key, $string, MCRYPT_MODE_ECB, $this->secure_iv);
-        $string = base64_encode($string);
-        return $string;
+        $first_key = base64_decode($this->secure_key);
+        $second_key = base64_decode($this->secure_iv);
+
+        $method = "aes-256-cbc";
+        $iv_length = openssl_cipher_iv_length($method);
+        $iv = $iv_length;
+
+        $first_encrypted = openssl_encrypt($string, $method, $first_key, OPENSSL_RAW_DATA, $iv);
+        $second_encrypted = hash_hmac('sha3-512', $first_encrypted, $second_key, TRUE);
+
+        $output = base64_encode($iv . $second_encrypted . $first_encrypted);
+        return $output;
     }
     /**
      * Decrypts a string
      *
      * @param string $string The string to be decrypted
-     * @return The string decrypted
+     * @return string The decrypted string 
      */
     public function decrypt($string)
     {
-        $string = base64_decode($string);
-        $str = mcrypt_decrypt(MCRYPT_DES, $this->secure_key, $string, MCRYPT_MODE_ECB, $this->secure_iv);
-        $block = mcrypt_get_block_size(MCRYPT_DES, MCRYPT_MODE_ECB);
-        $pad = ord($str[ ($len = strlen($str)) - 1]);
-        return substr($str, 0, strlen($str) - $pad);
+        $first_key = base64_decode($this->secure_key);
+        $second_key = base64_decode($this->secure_iv);
+        $mix = base64_decode($string);
+
+        $method = "aes-256-cbc";
+        $iv_length = openssl_cipher_iv_length($method);
+
+        $iv = substr($mix, 0, $iv_length);
+        $second_encrypted = substr($mix, $iv_length, 64);
+        $first_encrypted = substr($mix, $iv_length + 64);
+
+        $data = openssl_decrypt($first_encrypted, $method, $first_key, OPENSSL_RAW_DATA, $iv);
+        $second_encrypted_new = hash_hmac('sha3-512', $first_encrypted, $second_key, TRUE);
+
+        if (hash_equals($second_encrypted, $second_encrypted_new))
+            return $data;
+        else
+            return false;
     }
 }
-?>
