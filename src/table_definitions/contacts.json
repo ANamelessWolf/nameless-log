@@ -1,0 +1,15 @@
+{
+    "table_name": "contacts",
+    "driver": "MYSQL",
+    "columns": {
+        "userId": {
+            "numeric_precision": 10,
+            "numeric_scale": 0,
+            "numeric_type": 0,
+            "column_index": 1,
+            "column_name": "userId",
+            "data_type": "Integer",
+            "db_type": "int(11)"
+        }
+    }
+}

@@ -1,4 +1,6 @@
 <?php
+include_once  "model/Chat.php";
+include_once  "model/UserAccess.php";
 /**
  * Gets a system web service response
  *
@@ -67,4 +69,27 @@ function has_admin_privileges()
         $admin = get_system_property("admin")->username;
         return  $admin == $username;
     }
+}
+/**
+ * Get the chats available to a given user
+ * @param int $userId The user id
+ * @return array The chat array
+ */
+function get_chats($userId = null)
+{
+    $service  =  new  ChatService();
+    $urabe = $service->get_urabe();
+    $sql = "SELECT chatId, name FROM chat LEFT JOIN users ON users.userId = chat.userId";
+    if (!is_null($userId)) {
+        $sql .= " WHERE users.userId=@1";
+        $sql = $urabe->format_sql_place_holders($sql);
+        $result = $urabe->select($sql, array($userId))->result;
+    } else 
+        $result = $urabe->select($sql)->result;
+    return array_map(function ($item) {
+        $chat = new Chat();
+        $chat->chatId = $item["chatId"];
+        $chat->name = $item["name"];
+        return $chat;
+    }, $result);
 }
