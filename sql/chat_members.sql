@@ -6,6 +6,7 @@ CREATE TABLE `chat_members` (
 
 ALTER TABLE `chat_members`
   ADD PRIMARY KEY (`memberId`),
+  ADD UNIQUE KEY `chatId` (`chatId`,`userId`),
   ADD KEY `chat_member_id_fk` (`chatId`),
   ADD KEY `user_member_id_fk` (`userId`);
 

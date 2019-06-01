@@ -6,7 +6,10 @@ include_once  "lib/urabe/HasamiWrapper.php";
 class  ChatService  extends  HasamiWrapper
 {
 	const  TABLE_NAME  =  "chat";
-
+    /**
+     * Stores the user access
+     * @var UserAccess The user access
+     */
 	private $userAccess;
 	/**
 	 * Initialize a new instance for the user table controller
@@ -25,6 +28,7 @@ class  ChatService  extends  HasamiWrapper
 	}
 	/**
 	 * Validates access for chat services
+	 * Only logged users are allowed
 	 * @return boolean True if the validation access succeed
 	 */
 	protected function validate_access()
