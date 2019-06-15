@@ -13,7 +13,7 @@ class  ChatEntryService  extends  HasamiWrapper
 	 */
 	private $chatId;
 	/**
-	 * Chat encrypter key
+	 * Chat encryption key
 	 */
 	private $chatKey;
 	/**
