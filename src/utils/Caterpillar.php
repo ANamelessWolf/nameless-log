@@ -1,4 +1,6 @@
 <?php
+use ___PHPSTORM_HELPERS\object;
+
 /**
  * @var string NAMELESS_KEY
  * Shh this is the default crypto key
@@ -83,5 +85,22 @@ class Caterpillar
     public function decrypt($string)
     {
         return openssl_decrypt($string, $this->cypher, $this->secure_key, $this->options, $this->secure_iv);
+    }
+
+    /**
+     * Generates a random password
+     * @return string The random password encrypted and not encrypted
+     */
+    public function random_password()
+    {
+        $characters = '!#$&+-_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; strlen($randomString) < 8; $i++) {
+            $char = $characters[rand(0, $charactersLength - 1)];
+            if (strpos($randomString, $char) == false)
+                $randomString .= $char;
+        }
+        return (object)array("encrypted" => $this->encrypt($randomString), "password" => $randomString);
     }
 }

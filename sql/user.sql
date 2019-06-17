@@ -5,7 +5,8 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`userId`);
+  ADD PRIMARY KEY (`userId`),
+  ADD UNIQUE KEY `username` (`username`);
 
 ALTER TABLE `users`
   MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT;
