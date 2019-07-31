@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS `chat_entry`;
+DROP TABLE IF EXISTS `chat_members`;
+DROP TABLE IF EXISTS `contacts`;
+DROP TABLE IF EXISTS `chat`;
+DROP TABLE IF EXISTS `users`;

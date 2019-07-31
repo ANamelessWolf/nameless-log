@@ -1,4 +1,6 @@
 <?php
+use ___PHPSTORM_HELPERS\object;
+
 /**
  * @var string NAMELESS_KEY
  * Shh this is the default crypto key
@@ -8,7 +10,7 @@ const NAMELESS_KEY = "N4m3LeSs";
  * @var string NAMELESS_IV
  * Shh this is the default vector
  */
-const NAMELESS_IV = "tYzX78SZ";
+const NAMELESS_IV = "MTYttcmDrDl6IQwne81g1/gO";
 /**
  * This class encrypts and decrypts a string using the DES
  * algorithm and ths ECB MODE
@@ -28,14 +30,28 @@ class Caterpillar
      */
     protected $secure_iv;
     /**
+     * AES Authenticated Encryption type
+     *
+     * @var string cypher algorithm
+     */
+    protected $cypher;
+    /**
+     * Encryption options
+     *
+     * @var int cypher options
+     */
+    protected $options;
+    /**
      * Initialize a new instance of the caterpillar class
      * @param string $key The encryption key
      * @param string $iv The encryption vector.
      */
-    public function __construct($key = NAMELESS_KEY, $iv = NAMELESS_IV)
+    public function __construct($key = NAMELESS_KEY)
     {
         $this->secure_key = $key;
-        $this->secure_iv = $iv;
+        $this->secure_iv = NAMELESS_IV;
+        $this->cypher = "AES-256-CBC";
+        $this->options = OPENSSL_RAW_DATA;
     }
     /**
      * Gets the bytes from a string, using ASCII encoding
@@ -54,30 +70,37 @@ class Caterpillar
      * Encrypts a string
      *
      * @param string $string The string to be encrypted
-     * @return The string encrypted
+     * @return string The encrypted string
      */
     public function encrypt($string)
     {
-        $block = mcrypt_get_block_size(MCRYPT_DES, MCRYPT_MODE_ECB);
-        $pad = $block - (strlen($string) % $block);
-        $string .= str_repeat(chr($pad), $pad);
-        $string = mcrypt_encrypt(MCRYPT_DES, $this->secure_key, $string, MCRYPT_MODE_ECB, $this->secure_iv);
-        $string = base64_encode($string);
-        return $string;
+        return openssl_encrypt($string, $this->cypher, $this->secure_key, $this->options, $this->secure_iv);
     }
     /**
      * Decrypts a string
      *
      * @param string $string The string to be decrypted
-     * @return The string decrypted
+     * @return string The decrypted string 
      */
     public function decrypt($string)
     {
-        $string = base64_decode($string);
-        $str = mcrypt_decrypt(MCRYPT_DES, $this->secure_key, $string, MCRYPT_MODE_ECB, $this->secure_iv);
-        $block = mcrypt_get_block_size(MCRYPT_DES, MCRYPT_MODE_ECB);
-        $pad = ord($str[ ($len = strlen($str)) - 1]);
-        return substr($str, 0, strlen($str) - $pad);
+        return openssl_decrypt($string, $this->cypher, $this->secure_key, $this->options, $this->secure_iv);
+    }
+
+    /**
+     * Generates a random password
+     * @return string The random password encrypted and not encrypted
+     */
+    public function random_password()
+    {
+        $characters = '!#$&+-_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; strlen($randomString) < 8; $i++) {
+            $char = $characters[rand(0, $charactersLength - 1)];
+            if (strpos($randomString, $char) == false)
+                $randomString .= $char;
+        }
+        return (object)array("encrypted" => $this->encrypt($randomString), "password" => $randomString);
     }
 }
-?>

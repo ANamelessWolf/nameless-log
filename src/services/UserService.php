@@ -25,16 +25,7 @@ class  UserService  extends  HasamiWrapper
 	 */
 	protected function validate_access()
 	{
-		session_start();
-		$token = $_SESSION["token"];
-		if (is_null($token))
-			return true;
-		else {
-			$sql =	$this->urabe->format_sql_place_holders("SELECT username FROM " . self::TABLE_NAME . " WHERE SHA1(CONCAT(username,pass)) = @1");
-			$username = $this->urabe->select_one($sql, array($token));
-			$admin = get_system_property("admin")->username;
-			return $admin == $username;
-		}
+		return has_admin_privileges();
 	}
 	/**
 	 * List all available users, this method is restricted to be used only
@@ -45,14 +36,19 @@ class  UserService  extends  HasamiWrapper
 	 */
 	public function u_action_list($data, $urabe)
 	{
-		$this->set_service_status("POST", ServiceStatus::LOGGED);
 		$data->restrict_by_content("POST");
-		$sql = "SELECT * FROM " . self::TABLE_NAME;
-		$result = $urabe->select($sql);
-		$cat = new Caterpillar();
-		for ($i = 0; $i < $result->size; $i++)
-			$result->result[$i]["pass"] = $cat->decrypt($result->result[$i]["pass"]);
-		return $result;
+		if (has_admin_privileges()) {
+			$sql = "SELECT * FROM " . self::TABLE_NAME;
+			$result = $urabe->select($sql);
+			$cat = new Caterpillar();
+			for ($i = 0; $i < $result->size; $i++)
+				$result->result[$i]["pass"] = $cat->decrypt($result->result[$i]["pass"]);
+			return $result;
+		} else {
+			KanojoX::$http_error_code = 403;
+			$response = get_system_response("users", "Unauthorized");
+			throw new Exception($response->error);
+		}
 	}
 	/**
 	 * Gets a user from the database by selecting its id
@@ -62,26 +58,20 @@ class  UserService  extends  HasamiWrapper
 	 */
 	public function u_action_get_user($data, $urabe)
 	{
-		session_start();
-		$token = $_SESSION["token"];
 		$data->restrict_by_content("POST");
-		if (is_null($token))
-			return get_system_response("users", "NotLogged");
-		else {
-			$sql =	$this->urabe->format_sql_place_holders("SELECT * FROM " . self::TABLE_NAME . " WHERE SHA1(CONCAT(username,pass)) = @1");
-			$queryResult = $this->urabe->select($sql, array($token));
-			$username = $queryResult->result[0]["username"];
-			$userId = $queryResult->result[0]["userId"];
-			$admin = get_system_property("admin")->username;
-			if ($admin == $username || $userId == $data->body->userId) {
-				$userId = $data->body->userId;
-				$sql = "SELECT * FROM " . self::TABLE_NAME . " WHERE userId = $userId";
-				$result = $urabe->select($sql);
-				$cat = new Caterpillar();
-				if ($result->size > 0)
-					$result->result[0]["pass"] = $cat->decrypt($result->result[0]["pass"]);
-			}
+		$access = get_access($data->body->condition);
+		if ($access->hasAccess) {
+			$userId = $data->body->userId;
+			$sql = "SELECT * FROM " . self::TABLE_NAME . " WHERE userId = $userId";
+			$result = $urabe->select($sql);
+			$cat = new Caterpillar();
+			if ($result->size > 0)
+				$result->result[0]["pass"] = $cat->decrypt($result->result[0]["pass"]);
 			return $result;
+		} else {
+			KanojoX::$http_error_code = 403;
+			$response = get_system_response("users", "Unauthorized");
+			throw new Exception($response->error);
 		}
 	}
 	/**
@@ -93,27 +83,17 @@ class  UserService  extends  HasamiWrapper
 	 */
 	public function update_user($data, $urabe)
 	{
-		session_start();
-		$token = $_SESSION["token"];
-		if (is_null($token))
-			return get_system_response("users", "NotLogged");
-		else {
-			$sql =	$this->urabe->format_sql_place_holders("SELECT * FROM " . self::TABLE_NAME . " WHERE SHA1(CONCAT(username,pass)) = @1");
-			$queryResult = $this->urabe->select($sql, array($token));
-			$username = $queryResult->result[0]["username"];
-			$userId = $queryResult->result[0]["userId"];
-			$admin = get_system_property("admin")->username;
-			if ($admin == $username || $userId == $data->body->condition) {
-				$cat = new Caterpillar();
-				$values = $data->body->values;
-				$values->pass = $cat->encrypt($values->pass);
-				$userId = $data->body->condition;
-				return $urabe->update(self::TABLE_NAME, $values, "userId=$userId");
-			} else {
-				KanojoX::$http_error_code = 403;
-				$response = get_system_response("users", "Unauthorized");
-				throw new Exception($response->error);
-			}
+		$access = get_access($data->body->condition);
+		if ($access->hasAccess) {
+			$cat = new Caterpillar();
+			$values = $data->body->values;
+			$values->pass = $cat->encrypt($values->pass);
+			$userId = $data->body->condition;
+			return $urabe->update(self::TABLE_NAME, $values, "userId=$userId");
+		} else {
+			KanojoX::$http_error_code = 403;
+			$response = get_system_response("users", "Unauthorized");
+			throw new Exception($response->error);
 		}
 	}
 	/**
@@ -149,7 +129,9 @@ class  UserService  extends  HasamiWrapper
 		$sql = $urabe->format_sql_place_holders($sql);
 		$cat = new Caterpillar();
 		$urabe->set_parser(new MysteriousParser());
-		$token = $urabe->select_one($sql, array($data->body->username, $cat->encrypt($data->body->pass)));
+		$password = $cat->encrypt($data->body->pass);
+
+		$token = $urabe->select_one($sql, array($data->body->username, $password));
 		if (!is_null($token)) {
 			session_start();
 			$_SESSION["token"] = sha1($token);
@@ -169,8 +151,6 @@ class  UserService  extends  HasamiWrapper
 		$_SESSION["token"] = null;
 		return get_system_response("users", "loginOut");
 	}
-
-
 	/**
 	 * Checks the current session token
 	 * @param WebServiceContent $data The web service content

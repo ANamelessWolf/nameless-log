@@ -25,7 +25,7 @@ return (object)array(
         ),
         "loginOut" => (object)array(
             "succeed" => true,
-            "error" => "Logged out from the system",
+            "message" => "Logged out from the system",
         ),
         "Unauthorized" => (object)array(
             "succeed" => false,

@@ -1,0 +1,47 @@
+{
+    "table_name": "chat_entry",
+    "driver": "MYSQL",
+    "columns": {
+        "entryId": {
+            "numeric_precision": 10,
+            "numeric_scale": 0,
+            "numeric_type": 0,
+            "column_index": 1,
+            "column_name": "entryId",
+            "data_type": "Integer",
+            "db_type": "int(11)"
+        },
+        "chatId": {
+            "numeric_precision": 10,
+            "numeric_scale": 0,
+            "numeric_type": 0,
+            "column_index": 2,
+            "column_name": "chatId",
+            "data_type": "Integer",
+            "db_type": "int(11)"
+        },
+        "userId": {
+            "numeric_precision": 10,
+            "numeric_scale": 0,
+            "numeric_type": 0,
+            "column_index": 3,
+            "column_name": "userId",
+            "data_type": "Integer",
+            "db_type": "int(11)"
+        },
+        "entry": {
+            "char_max_length": 65535,
+            "column_index": 4,
+            "column_name": "entry",
+            "data_type": "String",
+            "db_type": "text"
+        },
+        "creation_time": {
+            "date_format": "m-d-y",
+            "column_index": 5,
+            "column_name": "creation_time",
+            "data_type": "Date",
+            "db_type": "timestamp"
+        }
+    }
+}
