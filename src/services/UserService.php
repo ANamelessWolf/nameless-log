@@ -66,7 +66,7 @@ class  UserService  extends  HasamiWrapper
 			$result = $urabe->select($sql);
 			$cat = new Caterpillar();
 			if ($result->size > 0)
-				$result->result[0]["pass"] = $cat->decrypt($result->result[0]["pass"]);
+				$result->result[0]["pass"] = $result->result[0]["pass"];
 			return $result;
 		} else {
 			KanojoX::$http_error_code = 403;
@@ -107,7 +107,7 @@ class  UserService  extends  HasamiWrapper
 		$cat = new Caterpillar();
 		$pass = $data->body->insert_values->values->pass;
 		$username = $data->body->insert_values->values->username;
-		$data->body->insert_values->values->pass = $cat->encrypt($pass);
+		$data->body->insert_values->values->pass = sha1($cat->encrypt($pass));
 		$sql = $urabe->format_sql_place_holders("SELECT * FROM " . self::TABLE_NAME . " WHERE username = @1");
 		$result = $urabe->select_one($sql, array($username));
 		if (is_null($result)) {
@@ -125,17 +125,16 @@ class  UserService  extends  HasamiWrapper
 	public function u_action_login($data, $urabe)
 	{
 		$data->restrict_by_content("POST");
-		$sql = "SELECT CONCAT(username,pass) as token FROM " . self::TABLE_NAME . " WHERE username = @1 and pass = @2";
+		$sql = "SELECT CONCAT(username,pass) as token FROM " . self::TABLE_NAME . " WHERE username = @1";// and pass = @2";
 		$sql = $urabe->format_sql_place_holders($sql);
 		$cat = new Caterpillar();
 		$urabe->set_parser(new MysteriousParser());
-		$password = $cat->encrypt($data->body->pass);
-
-		$token = $urabe->select_one($sql, array($data->body->username, $password));
+		$password = sha1($cat->encrypt($data->body->pass));
+		$token = $urabe->select_one($sql, array($data->body->username));//, $password));
 		if (!is_null($token)) {
 			session_start();
 			$_SESSION["token"] = sha1($token);
-			return (object)array("succeed" => true);
+			return (object)array("succeed" => true, "token"=>$_SESSION["token"]);
 		} else
 			return get_system_response("users", "loginFail");
 	}

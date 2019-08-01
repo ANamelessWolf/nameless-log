@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Nameless log entry point
  */
 
 include_once  "lib/urabe/HasamiWrapper.php";
 include_once  "services/UserService.php";
+include_once  "services/AliceService.php";
 include_once  "services/ChatService.php";
 include_once  "utils/Caterpillar.php";
 include_once  "utils/ServiceUtils.php";
@@ -12,6 +14,9 @@ include_once  "utils/ServiceUtils.php";
 $content = new WebServiceContent();
 $service_name = $content->url_params[0];
 switch ($service_name) {
+    case 'alice':
+        $service  =  new  AliceService();
+        break;
     case 'users':
         $service  =  new  UserService();
         break;

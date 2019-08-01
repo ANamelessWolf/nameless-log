@@ -10,7 +10,7 @@ const NAMELESS_KEY = "N4m3LeSs";
  * @var string NAMELESS_IV
  * Shh this is the default vector
  */
-const NAMELESS_IV = "MTYttcmDrDl6IQwne81g1/gO";
+const NAMELESS_IV = "MTYttcmDrDl6IQwn";
 /**
  * This class encrypts and decrypts a string using the DES
  * algorithm and ths ECB MODE
@@ -50,7 +50,7 @@ class Caterpillar
     {
         $this->secure_key = $key;
         $this->secure_iv = NAMELESS_IV;
-        $this->cypher = "AES-256-CBC";
+        $this->cypher = "AES-128-CBC";
         $this->options = OPENSSL_RAW_DATA;
     }
     /**
@@ -62,7 +62,7 @@ class Caterpillar
     function get_bytes($string)
     {
         $byte = array();
-        for ($i = 0; $i < mb_strlen($string, 'ASCII'); $i++)
+        for ($i = 0; $i < mb_strlen($string, 'UTF8'); $i++)
             array_push($byte, ord($string[$i]));
         return $byte;
     }
@@ -74,7 +74,8 @@ class Caterpillar
      */
     public function encrypt($string)
     {
-        return openssl_encrypt($string, $this->cypher, $this->secure_key, $this->options, $this->secure_iv);
+        $value = openssl_encrypt($string, $this->cypher, $this->secure_key, $this->options, $this->secure_iv);
+        return utf8_encode($value);
     }
     /**
      * Decrypts a string
@@ -84,6 +85,7 @@ class Caterpillar
      */
     public function decrypt($string)
     {
+        $string = utf8_decode($string);
         return openssl_decrypt($string, $this->cypher, $this->secure_key, $this->options, $this->secure_iv);
     }
 
