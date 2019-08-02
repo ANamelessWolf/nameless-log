@@ -21,6 +21,7 @@ switch ($service_name) {
         $service  =  new  UserService();
         break;
     case 'chat':
+        include_once  "services/ChatMembersService.php";
         $service  =  new  ChatService();
         break;
     case 'chat_member':
@@ -28,7 +29,7 @@ switch ($service_name) {
         $service  =  new  ChatMembersService();
         break;
     case 'chat_entry':
-        include_once  "services/ChatMembersService.php";
+
         include_once  "services/ChatEntryService.php";
         $service  =  new  ChatEntryService();
         break;

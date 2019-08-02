@@ -45,16 +45,12 @@ class  ChatService  extends  HasamiWrapper
 		$userId = $this->userAccess->userId;
 		$body = (object) array(
 			"chatId" => $chat_id,
-			"insert_values" => (object) array("columns" => array("chatId", "userId")),
-			"values" => (object) array("values" => (object) array("chatId" => $chat_id, "userId" => $userId))
+			"insert_values" => (object) array("columns" => array("chatId", "userId"),
+			"values" => (object) array("chatId" => $chat_id, "userId" => $userId))
 		);
 		$service = new ChatMembersService();
-		var_dump($service->request_data->body);
 		$service->request_data->body = $body;
-		var_dump($service->request_data->body);
-		die;
-		//  
-		//  $memberService->get_response();
+		$service->get_response();
 		return $response;
 	}
 
