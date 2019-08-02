@@ -1,4 +1,7 @@
 <?php
+
+use ___PHPSTORM_HELPERS\object;
+
 include_once  "lib/urabe/HasamiWrapper.php";
 /**
  * User table controller
@@ -22,10 +25,39 @@ class  ChatService  extends  HasamiWrapper
 		$connector->init($conn);
 		parent::__construct(self::TABLE_NAME, $connector, "chatId");
 		$this->set_service_status("POST", ServiceStatus::LOGGED);
+		$this->set_service_task("PUT", "create_chat");
 		$this->userAccess = get_access();
 		if ($this->request_data->method == "PUT")
 			$this->request_data->body->insert_values->values->{"userId"} = $this->userAccess->userId;
 	}
+	/**
+	 * Creates a chat and register the current user as a member
+	 * to the new chat
+	 * @param WebServiceContent $data The web service content
+	 * @param Urabe $urabe The database manager
+	 * @return UrabeResponse The server response
+	 */
+	public function create_chat($data, $urabe)
+	{
+		$response = $this->get_service("PUT")->default_action($data, $urabe);
+		$sql = "SELECT MAX(chatId) userId FROM " . self::TABLE_NAME;
+		$chat_id = $urabe->select_one($sql);
+		$userId = $this->userAccess->userId;
+		$body = (object) array(
+			"chatId" => $chat_id,
+			"insert_values" => (object) array("columns" => array("chatId", "userId")),
+			"values" => (object) array("values" => (object) array("chatId" => $chat_id, "userId" => $userId))
+		);
+		$service = new ChatMembersService();
+		var_dump($service->request_data->body);
+		$service->request_data->body = $body;
+		var_dump($service->request_data->body);
+		die;
+		//  
+		//  $memberService->get_response();
+		return $response;
+	}
+
 	/**
 	 * Validates access for chat services
 	 * Only logged users are allowed
@@ -50,6 +82,7 @@ class  ChatService  extends  HasamiWrapper
 			$sql = "SELECT * FROM " . self::TABLE_NAME;
 		else
 			$sql = "SELECT * FROM " . self::TABLE_NAME . " WHERE userId=@1";
+		$sql = $urabe->format_sql_place_holders($sql);
 		return $urabe->select($sql, array($this->userAccess->userId));
 	}
 }

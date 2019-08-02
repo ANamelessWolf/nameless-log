@@ -28,6 +28,7 @@ switch ($service_name) {
         $service  =  new  ChatMembersService();
         break;
     case 'chat_entry':
+        include_once  "services/ChatMembersService.php";
         include_once  "services/ChatEntryService.php";
         $service  =  new  ChatEntryService();
         break;
@@ -36,8 +37,20 @@ switch ($service_name) {
         $service  =  new  ContactService();
         break;
 }
-if (!is_null($service))
-    $result = $service->get_response();
-else
-    $result = get_system_response("common", "UnknownAction");
+
+try {
+
+    if (!is_null($service))
+        $result = $service->get_response();
+    else
+        $result = get_system_response("common", "UnknownAction");
+} catch (Exception $e) {
+    switch ($service_name) {
+        case 'contacts':
+            throw new Exception($service->get_error_msg(), 1);
+        default:
+            throw $e;
+    }
+}
+
 echo json_encode($result, JSON_PRETTY_PRINT);
