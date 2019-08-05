@@ -30,7 +30,7 @@ class  ChatMembersService  extends  HasamiWrapper
 		$connector->init($conn);
 		parent::__construct(self::TABLE_NAME, $connector, "memberId");
 		$this->set_service_status("GET", ServiceStatus::LOGGED);
-		$this->set_service_task("GET", "test");
+		$this->set_service_task("GET", "list_members");
 		$this->userAccess = get_access();
 		if ($this->userAccess->isAdmin)
 			$this->chats = get_chats();
@@ -59,7 +59,7 @@ class  ChatMembersService  extends  HasamiWrapper
 	 * @param Urabe $urabe The database manager
 	 * @return UrabeResponse The urabe response
 	 */
-	public function test($data, $urabe)
+	public function list_members($data, $urabe)
 	{
 		$fields = "cm.memberId, cm.userId, u.username, cm.chatId";
 		$sql = "SELECT $fields FROM chat_members cm LEFT JOIN users u ON cm.userId = u.userId WHERE chatId = @1";
@@ -67,5 +67,22 @@ class  ChatMembersService  extends  HasamiWrapper
 		$chatId = $data->body->chatId;
 		$urabe->set_parser(new MysteriousParser());
 		return $urabe->select($sql, array($chatId));
+	}
+	/**
+	 * List all available chats for the current user
+	 *
+	 * @param WebServiceContent $data The web service content
+	 * @param Urabe $urabe The database manager
+	 * @return UrabeResponse The urabe response
+	 */
+	public function u_action_get_chats($data, $urabe)
+	{
+		//$data->restrict_by_content("GET");
+		$userId = $this->userAccess->userId;
+		$fields = "c.chatId, c.name";
+		$sql = "SELECT $fields FROM `chat_members` cm LEFT JOIN `chat` c ON cm.chatId = c.chatId  WHERE cm.userId = @1";
+		$sql = $urabe->format_sql_place_holders($sql);
+		$urabe->set_parser(new MysteriousParser());
+		return $urabe->select($sql, array($userId));
 	}
 }
