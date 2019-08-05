@@ -7,10 +7,10 @@ include_once  "lib/urabe/HasamiWrapper.php";
 class  ContactService  extends  HasamiWrapper
 {
 	const  TABLE_NAME  =  "contacts";
-    /**
-     * Stores the user access
-     * @var UserAccess The user access
-     */
+	/**
+	 * Stores the user access
+	 * @var UserAccess The user access
+	 */
 	private $userAccess;
 	/**
 	 * Initialize a new instance for the user table controller
@@ -28,10 +28,23 @@ class  ContactService  extends  HasamiWrapper
 		$this->userAccess = get_access();
 	}
 	/**
+	 * Gets the error message when a bad request
+	 * is generated
+	 * @param Exception $e The bad request exception, it can be concatenated for a full error description
+	 * @return string The error message
+	 */
+	public function get_error_msg($e)
+	{
+		//return get_system_response("contacts", "errorMsg"). $e->getMessage();
+		return get_system_response("contacts", "errorMsg");
+	}
+
+	/**
 	 * Delete and PUT services requires
 	 * administration access
 	 */
-	public function validate_access(){
+	public function validate_access()
+	{
 		return $this->userAccess->isAdmin;
 	}
 

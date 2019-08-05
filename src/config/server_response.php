@@ -31,5 +31,8 @@ return (object)array(
             "succeed" => false,
             "error" => "You don't have permission for accessing this service",
         )
+    ),
+    "contacts" => (object)array(
+        "errorMsg"=> "Error processing the request. The user id is not valid.",
     )
 );

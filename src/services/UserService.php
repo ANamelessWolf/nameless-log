@@ -125,17 +125,16 @@ class  UserService  extends  HasamiWrapper
 	public function u_action_login($data, $urabe)
 	{
 		$data->restrict_by_content("POST");
-		$sql = "SELECT CONCAT(username,pass) as token FROM " . self::TABLE_NAME . " WHERE username = @1 and pass = @2";
+		$sql = "SELECT CONCAT(username,pass) as token FROM " . self::TABLE_NAME . " WHERE username = @1 AND pass = @2";
 		$sql = $urabe->format_sql_place_holders($sql);
 		$cat = new Caterpillar();
 		$urabe->set_parser(new MysteriousParser());
 		$password = $cat->encrypt($data->body->pass);
-
 		$token = $urabe->select_one($sql, array($data->body->username, $password));
 		if (!is_null($token)) {
 			session_start();
 			$_SESSION["token"] = sha1($token);
-			return (object)array("succeed" => true);
+			return (object)array("succeed" => true, "token"=>$_SESSION["token"]);
 		} else
 			return get_system_response("users", "loginFail");
 	}
