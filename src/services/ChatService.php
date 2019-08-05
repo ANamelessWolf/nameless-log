@@ -1,7 +1,5 @@
 <?php
 
-use ___PHPSTORM_HELPERS\object;
-
 include_once  "lib/urabe/HasamiWrapper.php";
 /**
  * User table controller
