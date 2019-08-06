@@ -89,12 +89,7 @@ class  ChatEntryService  extends  HasamiWrapper
 	public function u_action_list($data, $urabe)
 	{
 		$cat = new Caterpillar($this->chatKey);
-		$fields = "u.username, e.entryId, e.entry, e.creation_time, cm.memberId";
-		$lftJoinMembers = "`chat_members` cm ON e.memberId = cm.memberId";
-		$lftJoinUsers = "`users` u ON u.userId = cm.userId";
-		$orderBy = "e.creation_time, e.entryId";
-		$sql = "SELECT $fields FROM `chat_entry` e LEFT JOIN $lftJoinMembers LEFT JOIN $lftJoinUsers WHERE chatId = @1 ORDER BY $orderBy";
-		$sql = $urabe->format_sql_place_holders($sql);
+		$sql = $this->get_selection_query($urabe);
 		$query_result = $urabe->select($sql, array($this->chatId));
 		$result = $query_result->result;
 		for ($i = 0; $i < count($result); $i++)
@@ -102,6 +97,49 @@ class  ChatEntryService  extends  HasamiWrapper
 		$query_result->result = $result;
 		return $query_result;
 	}
+	/**
+	 * Select the last ten entries for the current chat
+	 * @param WebServiceContent $data The web service content
+	 * @param Urabe $urabe The database manager
+	 * @return UrabeResponse The urabe response
+	 */
+	public function u_action_last_ten($data, $urabe)
+	{
+		$cat = new Caterpillar($this->chatKey);
+		$sql = $this->get_selection_query($urabe, 10);
+		$query_result = $urabe->select($sql, array($this->chatId));
+		$result = $query_result->result;
+		for ($i = 0; $i < count($result); $i++)
+			$result[$i]["entry"] = $cat->decrypt($result[$i]["entry"]);
+		$query_result->result = $result;
+		return $query_result;
+	}
+	/**
+	 * Gets the query for selecting the current chat entries.
+	 * When entries are limited via the $limit variable it returns the
+	 * last $limit entries
+	 *
+	 * @param Urabe $urabe The database manager
+	 * @param int $limit The number of rows to be retrieved
+	 * @return string The selection query
+	 */
+	private function get_selection_query($urabe, $limit = NULL)
+	{
+		$fields = "u.username, e.entryId, e.entry, e.creation_time, cm.memberId";
+		$lftJoinMembers = "`chat_members` cm ON e.memberId = cm.memberId";
+		$lftJoinUsers = "`users` u ON u.userId = cm.userId";
+		$orderBy = "e.creation_time, e.entryId";
+		if (is_null($limit))
+			$sql = "SELECT $fields FROM `chat_entry` e LEFT JOIN $lftJoinMembers LEFT JOIN $lftJoinUsers WHERE chatId = @1 ORDER BY $orderBy";
+		else {
+			$sql = "SELECT $fields FROM `chat_entry` e LEFT JOIN $lftJoinMembers LEFT JOIN $lftJoinUsers WHERE chatId = @1 ORDER BY $orderBy DESC LIMIT $limit";
+			$orderBy = str_replace("e.", "tab.", $orderBy);
+			$sql = "SELECT * FROM ($sql) tab ORDER BY $orderBy";
+		}
+		$sql = $urabe->format_sql_place_holders($sql);
+		return $sql;
+	}
+
 
 	/**
 	 * Gets the member id and store in the
