@@ -9,7 +9,8 @@ return (object) array(
     ),
     "entries" =>
     (object) array(
-        "notAMemberMsg" => "It seems you are not a member of the current chat, or the chat does not exists."
+        "notAMemberMsg" => "It seems you are not a member of the current chat, or the chat does not exists.",
+        "protectedEntry" => "The entry can not be deleted with the current user"
     ),
     "users" =>
     (object) array(
