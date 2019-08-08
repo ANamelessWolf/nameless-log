@@ -10,6 +10,7 @@ include_once  "services/AliceService.php";
 include_once  "services/ChatService.php";
 include_once  "utils/Caterpillar.php";
 include_once  "utils/ServiceUtils.php";
+include_once  "config/UnauthorizedAccessException.php";
 
 $content = new WebServiceContent();
 $service_name = $content->url_params[0];

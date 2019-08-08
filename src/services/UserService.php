@@ -19,7 +19,7 @@ class  UserService  extends  HasamiWrapper
 	}
 	/**
 	 * Validates access to this web service only logged as an
-	 * Admin the user can use PUT and DELETE services
+	 * Admin the PUT and DELETE verbose is enable
 	 *
 	 * @return bool True if the user has permission
 	 */
@@ -44,11 +44,8 @@ class  UserService  extends  HasamiWrapper
 			for ($i = 0; $i < $result->size; $i++)
 				$result->result[$i]["pass"] = $cat->decrypt($result->result[$i]["pass"]);
 			return $result;
-		} else {
-			KanojoX::$http_error_code = 403;
-			$response = get_system_response("users", "Unauthorized");
-			throw new Exception($response->error);
-		}
+		} else
+			throw new UnauthorizedAccessException("users", "Unauthorized");
 	}
 	/**
 	 * Gets a user from the database by selecting its id
@@ -68,11 +65,8 @@ class  UserService  extends  HasamiWrapper
 			if ($result->size > 0)
 				$result->result[0]["pass"] = $cat->decrypt($result->result[0]["pass"]);
 			return $result;
-		} else {
-			KanojoX::$http_error_code = 403;
-			$response = get_system_response("users", "Unauthorized");
-			throw new Exception($response->error);
-		}
+		} else
+			throw new UnauthorizedAccessException("users", "Unauthorized");
 	}
 	/**
 	 * Registers an users in to the database, only admin can update
@@ -90,11 +84,8 @@ class  UserService  extends  HasamiWrapper
 			$values->pass = $cat->encrypt($values->pass);
 			$userId = $data->body->condition;
 			return $urabe->update(self::TABLE_NAME, $values, "userId=$userId");
-		} else {
-			KanojoX::$http_error_code = 403;
-			$response = get_system_response("users", "Unauthorized");
-			throw new Exception($response->error);
-		}
+		} else
+			throw new UnauthorizedAccessException("users", "Unauthorized");
 	}
 	/**
 	 * Updates user data
@@ -134,7 +125,7 @@ class  UserService  extends  HasamiWrapper
 		if (!is_null($token)) {
 			session_start();
 			$_SESSION["token"] = sha1($token);
-			return (object)array("succeed" => true, "token"=>$_SESSION["token"]);
+			return (object) array("succeed" => true, "token" => $_SESSION["token"]);
 		} else
 			return get_system_response("users", "loginFail");
 	}
