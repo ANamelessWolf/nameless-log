@@ -1,0 +1,37 @@
+{
+    "definitions": {},
+    "$schema": "",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "Login Schema",
+    "description": "Basic schema used to send login credentials to the server",
+    "default": null,
+    "required": [
+        "username",
+        "pass"
+    ],
+    "properties": {
+        "username": {
+            "$id": "#/properties/username",
+            "type": "string",
+            "title": "The username value",
+            "description": "Specifies the user name value. The username should not contain spaces or be empty.",
+            "default": "",
+            "examples": [
+                "nameless"
+            ],
+            "pattern": "^(?![nN][uU][lL]{2}$)\\\\s*\\\\S.*"
+        },
+        "pass": {
+            "$id": "#/properties/pass",
+            "type": "string",
+            "title": "The Password value",
+            "description": "Password value should not be empty and should not contain white spaces",
+            "default": "",
+            "examples": [
+                "pass123"
+            ],
+            "pattern": "^(?![nN][uU][lL]{2}$)\\\\s*\\\\S.*"
+        }
+    }
+}
