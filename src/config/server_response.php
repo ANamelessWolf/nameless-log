@@ -1,5 +1,18 @@
 <?php
+
 return (object) array(
+    "installer" =>
+    (object) array(
+        "MissingSQLFolder" => "The Installation can not find the SQL folder. Check if the path is correct",
+        "MissingSQLScript" => "The Installation can not open the file '%s' check if the file is valid and the system is able to read it.",
+        "QueryError" => "Error executing the query '%s'",
+        "ErrorCreatingAdmin" => "Error creating the administrator user",
+        "InstallationSucceed" => (object) array(
+            "succeed" => true,
+            "message" => "Installation succeed",
+            "admin" => (object) array("username" => "", "pass" => "")
+        ),
+    ),
     "common" =>
     (object) array(
         "UnknownAction" => (object) array(
