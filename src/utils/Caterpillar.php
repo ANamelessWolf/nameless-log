@@ -1,6 +1,4 @@
 <?php
-use ___PHPSTORM_HELPERS\object;
-
 /**
  * @var string NAMELESS_KEY
  * Shh this is the default crypto key

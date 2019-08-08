@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Define an exception that is thrown when the system denies access 
  * to a service
