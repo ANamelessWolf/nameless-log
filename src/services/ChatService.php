@@ -1,12 +1,12 @@
 <?php
 
-include_once  "lib/urabe/HasamiWrapper.php";
+include_once "lib/urabe/HasamiWrapper.php";
 /**
- * User table controller
+ * Chat service controller. Manage chat creation
  */
-class  ChatService  extends  HasamiWrapper
+class ChatService extends HasamiWrapper
 {
-	const  TABLE_NAME  =  "chat";
+	const TABLE_NAME = "chat";
 	/**
 	 * Stores the user access
 	 * @var UserAccess The user access
@@ -15,10 +15,10 @@ class  ChatService  extends  HasamiWrapper
 	/**
 	 * Initialize a new instance for the user table controller
 	 */
-	public  function  __construct()
+	public function __construct()
 	{
 		$properties = require dirname(__FILE__) . '/../config/properties.php';
-		$connector  =  new  MYSQLKanojoX();
+		$connector = new MYSQLKanojoX();
 		$conn = $properties->connection;
 		$connector->init($conn);
 		parent::__construct(self::TABLE_NAME, $connector, "chatId");
@@ -27,6 +27,17 @@ class  ChatService  extends  HasamiWrapper
 		$this->userAccess = get_access();
 		if ($this->request_data->method == "PUT")
 			$this->request_data->body->insert_values->values->{"userId"} = $this->userAccess->userId;
+	}
+	/**
+	 * Validates access for chat services
+	 * Only logged users are allowed
+	 * @return boolean True if the validation access succeed
+	 */
+	protected function validate_access()
+	{
+		session_start();
+		$token = $_SESSION["token"];
+		return !is_null($token);
 	}
 	/**
 	 * Creates a chat and register the current user as a member
@@ -43,25 +54,15 @@ class  ChatService  extends  HasamiWrapper
 		$userId = $this->userAccess->userId;
 		$body = (object) array(
 			"chatId" => $chat_id,
-			"insert_values" => (object) array("columns" => array("chatId", "userId"),
-			"values" => (object) array("chatId" => $chat_id, "userId" => $userId))
+			"insert_values" => (object) array(
+				"columns" => array("chatId", "userId"),
+				"values" => (object) array("chatId" => $chat_id, "userId" => $userId)
+			)
 		);
 		$service = new ChatMembersService();
 		$service->request_data->body = $body;
 		$service->get_response();
 		return $response;
-	}
-
-	/**
-	 * Validates access for chat services
-	 * Only logged users are allowed
-	 * @return boolean True if the validation access succeed
-	 */
-	protected function validate_access()
-	{
-		session_start();
-		$token = $_SESSION["token"];
-		return !is_null($token);
 	}
 	/**
 	 * List all available chats for the current user

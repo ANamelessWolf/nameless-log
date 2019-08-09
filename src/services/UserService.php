@@ -1,12 +1,14 @@
 <?php
+
 /**
- * User table controller
+ * User service controller. This service manage user login to the application
+ * and user management.
  */
 class  UserService  extends  HasamiWrapper
 {
 	const  TABLE_NAME  =  "users";
 	/**
-	 * Initialize a new instance for the user table controller
+	 * Initialize a new instance for the user service controller
 	 */
 	public  function  __construct()
 	{
@@ -18,8 +20,8 @@ class  UserService  extends  HasamiWrapper
 		$this->set_service_task("POST", "update_user");
 	}
 	/**
-	 * Validates access to this web service only logged as an
-	 * Admin the PUT and DELETE verbose is enable
+	 * Validates access to this web service only a logged user
+	 * declared admin can called the PUT and DELETE verbose
 	 *
 	 * @return bool True if the user has permission
 	 */
@@ -48,7 +50,8 @@ class  UserService  extends  HasamiWrapper
 			throw new UnauthorizedAccessException("users", "Unauthorized");
 	}
 	/**
-	 * Gets a user from the database by selecting its id
+	 * Gets a user data via its user id. This method is restricted
+	 * to the Admin
 	 * @param WebServiceContent $data The web service content
 	 * @param Urabe $urabe The database manager
 	 * @return UrabeResponse The urabe response
@@ -57,7 +60,7 @@ class  UserService  extends  HasamiWrapper
 	{
 		$data->restrict_by_content("POST");
 		$access = get_access($data->body->condition);
-		if ($access->hasAccess) {
+		if ($access->isAdmin) {
 			$userId = $data->body->userId;
 			$sql = "SELECT * FROM " . self::TABLE_NAME . " WHERE userId = $userId";
 			$result = $urabe->select($sql);
@@ -69,8 +72,9 @@ class  UserService  extends  HasamiWrapper
 			throw new UnauthorizedAccessException("users", "Unauthorized");
 	}
 	/**
-	 * Registers an users in to the database, only admin can update
-	 * any user
+	 * Updates user data. The Admin can update any user and
+	 * the logged user can only update his data.
+	 * Currently only password is allowed to be updated.
 	 * @param WebServiceContent $data The web service content
 	 * @param Urabe $urabe The database manager
 	 * @return UrabeResponse The server response
@@ -88,7 +92,8 @@ class  UserService  extends  HasamiWrapper
 			throw new UnauthorizedAccessException("users", "Unauthorized");
 	}
 	/**
-	 * Updates user data
+	 * Registers a new users in to the database via PUT verbose. Only Admin
+	 * can access this request.
 	 * @param WebServiceContent $data The web service content
 	 * @param Urabe $urabe The database manager
 	 * @return UrabeResponse The server response
@@ -125,9 +130,11 @@ class  UserService  extends  HasamiWrapper
 		if (!is_null($token)) {
 			session_start();
 			$_SESSION["token"] = sha1($token);
-			return (object) array("succeed" => true, "token" => $_SESSION["token"]);
+			$response = get_system_response("users", "tokenResponse");
+			$response->token = $_SESSION["token"];
 		} else
-			return get_system_response("users", "loginFail");
+			$response = get_system_response("users", "loginFail");
+		return $response;
 	}
 	/**
 	 * Logout from the system

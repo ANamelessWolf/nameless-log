@@ -30,11 +30,8 @@ class  AliceService  extends  HasamiWrapper
     {
         $cat = new Caterpillar();
         $values = $urabe->select_all(self::TABLE_NAME);
-        for ($i = 0; $i < sizeof($values->result); $i++) {
+        for ($i = 0; $i < sizeof($values->result); $i++) 
             $values->result[$i]["content"] = $cat->decrypt($values->result[$i]["content"]);
-            
-        }
-        var_dump($values->result[0]["content"]);
         return $values;
     }
 

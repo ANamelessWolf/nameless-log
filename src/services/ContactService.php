@@ -1,24 +1,24 @@
 <?php
-//SELECT users.* FROM `contacts` LEFT JOIN users ON contacts.userId = users.userId 
-include_once  "lib/urabe/HasamiWrapper.php";
+include_once "lib/urabe/HasamiWrapper.php";
 /**
- * User table controller
+ * Contact service controller. This service is used to list public
+ * contacts to be added to a chat.
  */
-class  ContactService  extends  HasamiWrapper
+class ContactService extends HasamiWrapper implements ICostumeErrorMessage
 {
-	const  TABLE_NAME  =  "contacts";
+	const TABLE_NAME = "contacts";
 	/**
 	 * Stores the user access
 	 * @var UserAccess The user access
 	 */
 	private $userAccess;
 	/**
-	 * Initialize a new instance for the user table controller
+	 * Initialize a new instance for the contact service controller
 	 */
-	public  function  __construct()
+	public function __construct()
 	{
 		$properties = require dirname(__FILE__) . '/../config/properties.php';
-		$connector  =  new  MYSQLKanojoX();
+		$connector = new MYSQLKanojoX();
 		$conn = $properties->connection;
 		$connector->init($conn);
 		parent::__construct(self::TABLE_NAME, $connector, "userId");
@@ -28,17 +28,17 @@ class  ContactService  extends  HasamiWrapper
 		$this->userAccess = get_access();
 	}
 	/**
-	 * Gets the error message when a bad request
-	 * is generated
+	 * Creates a costume error message generated when a bad request is generated
+	 * 
 	 * @param Exception $e The bad request exception, it can be concatenated for a full error description
 	 * @return string The error message
 	 */
 	public function get_error_msg($e)
 	{
-		//return get_system_response("contacts", "errorMsg"). $e->getMessage();
+		//Uncomment the next line, to see the full message error
+		//return $e->getMessage();
 		return get_system_response("contacts", "errorMsg");
 	}
-
 	/**
 	 * Delete and PUT services requires
 	 * administration access
@@ -47,7 +47,6 @@ class  ContactService  extends  HasamiWrapper
 	{
 		return $this->userAccess->isAdmin;
 	}
-
 	/**
 	 * Gets the public contacts from the chat
 	 * @param WebServiceContent $data The web service content
@@ -57,7 +56,7 @@ class  ContactService  extends  HasamiWrapper
 	public function get_public_contacts($data, $urabe)
 	{
 		$sql = "SELECT users.userId, users.username FROM " . self::TABLE_NAME . " LEFT JOIN users ON contacts.userId = users.userId";
-		$service  =  new  UserService();
+		$service = new UserService();
 		$urabe = $service->get_urabe();
 		return $urabe->select($sql);
 	}

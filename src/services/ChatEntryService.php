@@ -1,7 +1,8 @@
 <?php
 include_once  "lib/urabe/HasamiWrapper.php";
 /**
- * User table controller
+ * Chat entry controller. Manage the message entries from a
+ * chat
  */
 class  ChatEntryService  extends  HasamiWrapper
 {
@@ -38,9 +39,7 @@ class  ChatEntryService  extends  HasamiWrapper
 		$connector->init($conn);
 		parent::__construct(self::TABLE_NAME, $connector, "entryId");
 		$this->set_service_status("POST", ServiceStatus::LOGGED);
-
 		$this->userAccess = get_access();
-
 		if ($this->request_data->in_GET_variables("chatId"))
 			$this->chatId = $this->request_data->get_variables["chatId"];
 		else
@@ -62,7 +61,6 @@ class  ChatEntryService  extends  HasamiWrapper
 				throw new Exception(get_system_response("entries", "notAMemberMsg"));
 			if (is_null($this->chatId))
 				throw new Exception("Invalid request");
-
 			$urabe = $this->urabe->get_clone();
 			$sql = "SELECT COUNT(*) as total FROM chat_members WHERE chatId = @1 AND userId = @2";
 			$sql = $urabe->format_sql_place_holders($sql);

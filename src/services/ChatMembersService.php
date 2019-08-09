@@ -2,7 +2,8 @@
 include_once  "lib/urabe/HasamiWrapper.php";
 
 /**
- * User table controller
+ * Chat members service controller. Manage the relation between chats
+ * and users. An user in a chat is called a chat member
  */
 class  ChatMembersService  extends  HasamiWrapper
 {
@@ -77,7 +78,6 @@ class  ChatMembersService  extends  HasamiWrapper
 	 */
 	public function u_action_get_chats($data, $urabe)
 	{
-		//$data->restrict_by_content("GET");
 		$userId = $this->userAccess->userId;
 		$fields = "c.chatId, c.name";
 		$sql = "SELECT $fields FROM `chat_members` cm LEFT JOIN `chat` c ON cm.chatId = c.chatId  WHERE cm.userId = @1";

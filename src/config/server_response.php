@@ -48,6 +48,10 @@ return (object) array(
         "Unauthorized" => (object) array(
             "succeed" => false,
             "error" => "You don't have permission for accessing this service",
+        ),
+        "tokenResponse" => (object) array(
+            "succeed" => true,
+            "token" => $_SESSION["token"]
         )
     ),
     "contacts" => (object) array(
