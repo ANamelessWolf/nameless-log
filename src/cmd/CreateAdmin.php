@@ -11,21 +11,20 @@ $admin = $properties->admin->username;
 $connector  =  new  MYSQLKanojoX();
 $connector->init($conn);
 $urabe = new Urabe($connector);
-$caterpillar = new Caterpillar();
-$password = $caterpillar->random_password();
-$values = (object)array(
+$cat = new Caterpillar();
+$pass = $cat->random_password();
+$values = (object) array(
     "username" => $admin,
-    "pass" => $password->encrypted
+    "pass" => $pass->encrypted
 );
 $response = new UrabeResponse();
 try {
     $qResult = $urabe->insert("users", $values);
-    if ($qResult->succeed)
-        echo json_encode($response->get_response("Admin created", array("username" => $admin, "pass" => $password->password)));
-    else
-        echo json_encode($response->get_response("Admin already exists", array()));
+    echo json_encode($response->get_response("Admin created", array("username" => $admin, "pass" => $pass->password)));
 } catch (Exception $e) {
-    $response = $response->get_response("Admin already exists", array());
+    $queryResult = $urabe->select("SELECT * FROM users WHERE username = '$admin'");
+    $password = $queryResult->result[0]['pass'];
+    $response = $response->get_response("Admin already exists", array("username" => $admin, "pass" => $cat->decrypt($password)));
     $response->error = $e->getMessage();
     echo json_encode($response);
 }
