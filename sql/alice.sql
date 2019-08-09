@@ -1,4 +1,4 @@
-CREATE TABLE `alice` (
+CREATE TABLE `nameless_log`.`alice` (
   `id` int(11) NOT NULL,
   `val` text COLLATE utf8_spanish_ci NOT NULL,
   `content` text COLLATE utf8_spanish_ci NOT NULL

@@ -5,8 +5,8 @@ CREATE TABLE `nameless_log`.`chat_entry` (
 `creation_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
 PRIMARY KEY (`entryId`)) ENGINE = InnoDB;
 
-ALTER TABLE `chat_entry`
+ALTER TABLE `nameless_log`.`chat_entry`
   ADD KEY `member_entry_id_fk` (`memberId`);
 
-ALTER TABLE `chat_entry`
-  ADD CONSTRAINT `member_entry_id_fk` FOREIGN KEY (`memberId`) REFERENCES `chat_members` (`memberId`) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE `nameless_log`.`chat_entry`
+  ADD CONSTRAINT `member_entry_id_fk` FOREIGN KEY (`memberId`) REFERENCES `nameless_log`.`chat_members` (`memberId`) ON DELETE CASCADE ON UPDATE NO ACTION;
