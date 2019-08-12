@@ -1,5 +1,6 @@
 <?php
 include_once  "lib/urabe/HasamiWrapper.php";
+include_once  "model/EntryParser.php";
 /**
  * Chat entry controller. Manage the message entries from a
  * chat
@@ -160,12 +161,8 @@ class  ChatEntryService  extends  HasamiWrapper
 	 */
 	private function get_query_result($urabe, $sql)
 	{
-		$cat = new Caterpillar($this->chatKey);
-		$query_result = $urabe->select($sql, array($this->chatId));
-		$result = $query_result->result;
-		for ($i = 0; $i < count($result); $i++)
-			$result[$i]["entry"] = $cat->decrypt($result[$i]["entry"]);
-		$query_result->result = $result;
+		$parser = new EntryParser($this->chatKey);
+		$query_result = $urabe->select($sql, array($this->chatId), $parser);
 		return $query_result;
 	}
 	/**
